@@ -3,18 +3,18 @@ import './App.css';
 
 import api from './services/api';
 
-import LoginPage from './containers/loginPage';
+import RegistrationPage from './containers/registrationPage';
 
 class App extends React.Component {
   state = {
     // *** REGISTRATION STATES ***
-    loggedIn: false,
+    loggedIn: true,
     firstName: undefined,
     lastName: undefined,
     email: undefined,
     password: undefined,
     confirmPassword: undefined,
-    error: false
+    registrationError: false
   }
 
   handleFirstNameChange = (e) => {
@@ -42,28 +42,43 @@ class App extends React.Component {
     this.setState({confirmPassword: e.target.value});
   }
 
-  handleRegistrationSubmit = (firstName, lastName, email, password)  => {
-    api.addUser(firstName, lastName, email, password);
+  handleRegistrationSubmit = ()  => {
+    console.log('wooo')
+    if (!this.state.email.includes('@', '.')){
+      this.setState({registrationError: 'Please enter a valid e-mail address'});
+    } else if (this.state.password !== this.state.confirmPassword){
+      this.setState({registrationError: 'Please make sure your passwords match'});
+    } else {
+      api.addUser({
+        first_name: this.state.firstName,
+        last_name: this.state.lastName,
+        email: this.state.email,
+        password: this.state.password
+      });
+      this.setState({registrationError: false, loggedIn: true});
+    };
   }
 
   render(){
     return (
       <div>
-        <LoginPage
-          firstName={this.state.firstName}
-          lastName={this.state.lastName}
-          email={this.state.email}
-          password={this.state.password}
-          confirmPassword={this.state.confirmPassword}
-          error={this.state.error}
+        {!this.state.loggedIn &&
+          <RegistrationPage
+            firstName={this.state.firstName}
+            lastName={this.state.lastName}
+            email={this.state.email}
+            password={this.state.password}
+            confirmPassword={this.state.confirmPassword}
+            registrationError={this.state.registrationError}
 
-          handleFirstNameChange={this.handleFirstNameChange}
-          handleLastNameChange={this.handleLastNameChange}
-          handleEmailChange={this.handleEmailChange}
-          handlePasswordChange={this.handlePasswordChange}
-          handleConfirmPasswordChange={this.handleConfirmPasswordChange}
-          handleRegistrationSubmit={this.handleRegistrationSubmit}
-        />
+            handleFirstNameChange={this.handleFirstNameChange}
+            handleLastNameChange={this.handleLastNameChange}
+            handleEmailChange={this.handleEmailChange}
+            handlePasswordChange={this.handlePasswordChange}
+            handleConfirmPasswordChange={this.handleConfirmPasswordChange}
+            handleRegistrationSubmit={this.handleRegistrationSubmit}
+          />
+        }
       </div>
     )
   }

@@ -1,6 +1,7 @@
 const API_BASE = 'http://localhost:3000';
 
-const addUser = (firstName, lastName, email, password) => {
+const addUser = (data) => {
+  console.log(data)
   return fetch(`${API_BASE}/users`, {
     method: 'POST',
     headers: {
@@ -8,12 +9,12 @@ const addUser = (firstName, lastName, email, password) => {
       'Content-type': 'application/json'
     },
     body: JSON.stringify({
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      password: password
+      first_name: data.first_name,
+      last_name: data.last_name,
+      email: data.email,
+      password: data.password
     })
-  }).then(resp => resp.json())
+  }).then(resp => resp.json());
 }
 
 const api = {

@@ -1,20 +1,16 @@
 import React from 'react';
 import { Form, Button, Message } from 'semantic-ui-react';
 
-class LoginPage extends React.Component {
-
-
+class RegistrationPage extends React.Component {
 
   render(){
-    console.log(this.props);
     return (
       <React.Fragment>
-          {console.log(this.props)}
-        <Form error={this.props.error}>
+        <Form error={this.props.registrationError} onSubmit={this.props.handleRegistrationSubmit}>
           <Form.Field>
             <label> Name: </label>
             <input placeholder = "First Name" value = {this.props.firstName} onChange={this.props.handleFirstNameChange}/>
-            <input placeholder = "Last Name" value = {this.props.lastName} onChange={this.props.handleLastNameChange} error={{content:'something'}}/>
+            <input placeholder = "Last Name" value = {this.props.lastName} onChange={this.props.handleLastNameChange}/>
           </Form.Field>
           <Form.Field>
             <label> E-mail: </label>
@@ -27,8 +23,7 @@ class LoginPage extends React.Component {
           </Form.Field>
           <Message
             error
-            header='action'
-            content='test'
+            content={this.props.registrationError}
           />
           <Button
             primary
@@ -39,13 +34,11 @@ class LoginPage extends React.Component {
                 || !this.props.lastName
                 || !this.props.email
             }
-            onSubmit={this.props.handleRegistrationSubmit}
-          >
-          </Button>
+          />
         </Form>
       </React.Fragment>
     )
   }
 }
 
-export default LoginPage;
+export default RegistrationPage;
