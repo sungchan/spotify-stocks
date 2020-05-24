@@ -26,6 +26,7 @@ class RegistrationPage extends React.Component {
             content={this.props.registrationError}
           />
           <Button
+            content='Register'
             primary
             fluid
             size='huge'
@@ -33,6 +34,8 @@ class RegistrationPage extends React.Component {
             disabled={!this.props.firstName
                 || !this.props.lastName
                 || !this.props.email
+                || !this.props.password
+                || !this.props.confirmPassword
             }
           />
         </Form>

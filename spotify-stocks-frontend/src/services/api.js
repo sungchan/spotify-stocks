@@ -1,7 +1,6 @@
 const API_BASE = 'http://localhost:3000';
 
 const addUser = (data) => {
-  console.log(data)
   return fetch(`${API_BASE}/users`, {
     method: 'POST',
     headers: {
@@ -17,8 +16,23 @@ const addUser = (data) => {
   }).then(resp => resp.json());
 }
 
+const authUser = (data) => {
+  fetch(`${API_BASE}/auth`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify({
+      email: data.email,
+      password: data.password
+    })
+  }).then(resp => resp.json())
+}
+
 const api = {
-  addUser
+  addUser,
+  authUser
 }
 
 export default api;

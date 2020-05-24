@@ -15,7 +15,8 @@ class App extends React.Component {
     email: undefined,
     password: undefined,
     confirmPassword: undefined,
-    registrationError: false
+    registrationError: false,
+    loginError: false
   }
 
   handleFirstNameChange = (e) => {
@@ -44,7 +45,6 @@ class App extends React.Component {
   }
 
   handleRegistrationSubmit = ()  => {
-    console.log('wooo')
     if (!this.state.email.includes('@', '.')){
       this.setState({registrationError: 'Please enter a valid e-mail address'});
     } else if (this.state.password !== this.state.confirmPassword){
@@ -56,8 +56,21 @@ class App extends React.Component {
         email: this.state.email,
         password: this.state.password
       });
-      this.setState({registrationError: false, loggedIn: true});
+      this.setState({registrationError: false});
     };
+  }
+
+  handleLoginSubmit = () => {
+    api.authUser({
+      email: this.state.email,
+      password: this.state.password
+    }).then(resp => {
+      if (resp.error){
+        this.setState({loginError: true})
+      } else {
+        console.log('success')
+      }
+    })
   }
 
   render(){
@@ -66,24 +79,37 @@ class App extends React.Component {
         <Navbar/>
         <Switch>
           <Route path='/register' render={() => {
-              return (
-                <RegistrationPage
-                  firstName={this.state.firstName}
-                  lastName={this.state.lastName}
-                  email={this.state.email}
-                  password={this.state.password}
-                  confirmPassword={this.state.confirmPassword}
-                  registrationError={this.state.registrationError}
+            return (
+              <RegistrationPage
+                firstName={this.state.firstName}
+                lastName={this.state.lastName}
+                email={this.state.email}
+                password={this.state.password}
+                confirmPassword={this.state.confirmPassword}
+                registrationError={this.state.registrationError}
 
-                  handleFirstNameChange={this.handleFirstNameChange}
-                  handleLastNameChange={this.handleLastNameChange}
-                  handleEmailChange={this.handleEmailChange}
-                  handlePasswordChange={this.handlePasswordChange}
-                  handleConfirmPasswordChange={this.handleConfirmPasswordChange}
-                  handleRegistrationSubmit={this.handleRegistrationSubmit}
-                />
-              )
-          }} />
+                handleFirstNameChange={this.handleFirstNameChange}
+                handleLastNameChange={this.handleLastNameChange}
+                handleEmailChange={this.handleEmailChange}
+                handlePasswordChange={this.handlePasswordChange}
+                handleConfirmPasswordChange={this.handleConfirmPasswordChange}
+                handleRegistrationSubmit={this.handleRegistrationSubmit}
+              />
+            )
+          }}/>
+          <Route path='/login' render={() => {
+            return (
+              <LoginPage
+                email={this.state.email}
+                password={this.state.password}
+                loginError={this.state.loginError}
+
+                handleEmailChange={this.handleEmailChange}
+                handlePasswordChange={this.handlePasswordChange}
+                handleLoginSubmit={this.handleLoginSubmit}
+              />
+            )
+          }}/>
         </Switch>
       </div>
     )
