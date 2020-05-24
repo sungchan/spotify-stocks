@@ -14,17 +14,18 @@ class UsersController < ApplicationController
 
   # POST /users
   def create
-    @user = User.new(
-      first_name: params['first_name'],
-      last_name: params['last_name'],
-      email: params['email'],
-      password: params['password']
-    )
-
-    if @user.save
-      render json: @user, status: :created, location: @user
+    if User.find_by(email: params[:email])
+      render json: {error: "This email is already in use"}
     else
-      render json: @user.errors, status: :unprocessable_entity
+      @user = User.new(
+        first_name: params['first_name'],
+        last_name: params['last_name'],
+        email: params['email'],
+        password: params['password']
+      )
+      if @user.save
+        render json: @user
+      end
     end
   end
 
