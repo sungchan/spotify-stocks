@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, Switch, Route, withRouter } from 'react-router-dom';
+import { Switch, Route, withRouter } from 'react-router-dom';
 
 import api from './services/api';
 
@@ -18,10 +18,26 @@ class App extends React.Component {
     confirmPassword: '',
     registrationError: false,
     // *** LOGIN STATES ***
-    userId: '',
+    // userId: '',
     email: '',
     password: '',
     loginError: false
+  }
+
+  componentDidMount(){
+    const token = localStorage.getItem('token')
+    if (token){
+      api.findCurrentUser(token)
+      .then(resp => {
+        this.setState({
+          userId: resp.id,
+          firstName: resp.first_name,
+          lastName: resp.last_name,
+          email: resp.email
+
+        })
+      })
+    }
   }
 
   //******************************************************
@@ -54,7 +70,7 @@ class App extends React.Component {
   }
 
   handleRegistrationSubmit = ()  => {
-    if (!this.state.registerEmail.includes('@', '.')){
+    if (!this.state.registerEmail.includes('@') || !this.state.registerEmail.includes('.')){
       this.setState({registrationError: 'Please enter a valid e-mail address'});
     } else if (this.state.registerPassword !== this.state.confirmPassword){
       this.setState({registrationError: 'Please make sure your passwords match'});
@@ -73,17 +89,19 @@ class App extends React.Component {
             registrationError: false,
             firstName: resp.first_name,
             lastName: resp.last_name,
-            email: resp.email
+            email: resp.email,
+            registerEmail: '',
+            registerPassword: ''
           });
+          localStorage.setItem('token', this.state.userId)
           this.props.history.push('/portfolio');
         }
       })
-      this.setState({registrationError: false});
     };
   }
 
   //******************************************************
-  // LOGIN
+  // LOGIN/LOGOUT
   //******************************************************
 
   handleEmailChange = (e) => {
@@ -111,6 +129,7 @@ class App extends React.Component {
           lastName: resp.last_name,
           email: resp.email
         });
+        localStorage.setItem('token', this.state.userId)
         this.props.history.push('/portfolio');
       }
     })
@@ -118,15 +137,16 @@ class App extends React.Component {
 
   handleLogout = () => {
     this.props.history.push('/login');
+    localStorage.removeItem('token')
     this.setState({
-      firstName: undefined,
-      lastName: undefined,
-      email: undefined,
-      password: undefined,
-      confirmPassword: undefined,
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
       registrationError: false,
       loginError: false,
-      userId: undefined
+      userId: ''
     });
 
   }
@@ -147,38 +167,42 @@ class App extends React.Component {
           handleLogout={this.handleLogout}
         />
         <Switch>
-          <Route path='/register' render={() => {
-            return (
-              <RegistrationPage
-                firstName={this.state.firstName}
-                lastName={this.state.lastName}
-                registerEmail={this.state.registerEmail}
-                registerPassword={this.state.registerPassword}
-                confirmPassword={this.state.confirmPassword}
-                registrationError={this.state.registrationError}
+          {!this.state.userId &&
+            <React.Fragment>
+              <Route path='/register' render={() => {
+                  return (
+                    <RegistrationPage
+                      firstName={this.state.firstName}
+                      lastName={this.state.lastName}
+                      registerEmail={this.state.registerEmail}
+                      registerPassword={this.state.registerPassword}
+                      confirmPassword={this.state.confirmPassword}
+                      registrationError={this.state.registrationError}
 
-                handleFirstNameChange={this.handleFirstNameChange}
-                handleLastNameChange={this.handleLastNameChange}
-                handleRegisterEmailChange={this.handleRegisterEmailChange}
-                handleRegisterPasswordChange={this.handleRegisterPasswordChange}
-                handleConfirmPasswordChange={this.handleConfirmPasswordChange}
-                handleRegistrationSubmit={this.handleRegistrationSubmit}
-              />
-            )
-          }}/>
-        <Route path='/login' render={(routerProps) => {
-            return (
-              <LoginPage
-                email={this.state.email}
-                password={this.state.password}
-                loginError={this.state.loginError}
+                      handleFirstNameChange={this.handleFirstNameChange}
+                      handleLastNameChange={this.handleLastNameChange}
+                      handleRegisterEmailChange={this.handleRegisterEmailChange}
+                      handleRegisterPasswordChange={this.handleRegisterPasswordChange}
+                      handleConfirmPasswordChange={this.handleConfirmPasswordChange}
+                      handleRegistrationSubmit={this.handleRegistrationSubmit}
+                      />
+                  )
+                }}/>
+                <Route path='/login' render={(routerProps) => {
+                    return (
+                      <LoginPage
+                        email={this.state.email}
+                        password={this.state.password}
+                        loginError={this.state.loginError}
 
-                handleEmailChange={this.handleEmailChange}
-                handlePasswordChange={this.handlePasswordChange}
-                handleLoginSubmit={this.handleLoginSubmit}
-              />
-            )
-          }}/>
+                        handleEmailChange={this.handleEmailChange}
+                        handlePasswordChange={this.handlePasswordChange}
+                        handleLoginSubmit={this.handleLoginSubmit}
+                        />
+                    )
+                  }}/>
+            </React.Fragment>
+        }
         <Route path='/portfolio' render={(router) => {
             return (
               <Portfolio

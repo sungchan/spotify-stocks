@@ -10,4 +10,16 @@ class AuthController < ApplicationController
     end
   end
 
+  def show
+    token = request.headers['Authenticate']
+
+    user = User.find_by(id: token)
+
+    if user
+      render json: {id: user.id, email: user.email, first_name: user.first_name, last_name: user.last_name}
+    else
+      render json: {error: "Could not authenticate"}, status: 401
+    end
+  end
+
 end
