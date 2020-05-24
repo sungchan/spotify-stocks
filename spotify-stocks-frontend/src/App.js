@@ -1,14 +1,15 @@
 import React from 'react';
-import './App.css';
+import { Link, Switch, Route } from 'react-router-dom';
 
 import api from './services/api';
 
-import RegistrationPage from './containers/registrationPage';
+import RegistrationPage from './containers/RegistrationPage';
+import LoginPage from './containers/LoginPage';
+import Navbar from './containers/Navbar';
 
 class App extends React.Component {
   state = {
     // *** REGISTRATION STATES ***
-    loggedIn: true,
     firstName: undefined,
     lastName: undefined,
     email: undefined,
@@ -62,23 +63,28 @@ class App extends React.Component {
   render(){
     return (
       <div>
-        {!this.state.loggedIn &&
-          <RegistrationPage
-            firstName={this.state.firstName}
-            lastName={this.state.lastName}
-            email={this.state.email}
-            password={this.state.password}
-            confirmPassword={this.state.confirmPassword}
-            registrationError={this.state.registrationError}
+        <Navbar/>
+        <Switch>
+          <Route path='/register' render={() => {
+              return (
+                <RegistrationPage
+                  firstName={this.state.firstName}
+                  lastName={this.state.lastName}
+                  email={this.state.email}
+                  password={this.state.password}
+                  confirmPassword={this.state.confirmPassword}
+                  registrationError={this.state.registrationError}
 
-            handleFirstNameChange={this.handleFirstNameChange}
-            handleLastNameChange={this.handleLastNameChange}
-            handleEmailChange={this.handleEmailChange}
-            handlePasswordChange={this.handlePasswordChange}
-            handleConfirmPasswordChange={this.handleConfirmPasswordChange}
-            handleRegistrationSubmit={this.handleRegistrationSubmit}
-          />
-        }
+                  handleFirstNameChange={this.handleFirstNameChange}
+                  handleLastNameChange={this.handleLastNameChange}
+                  handleEmailChange={this.handleEmailChange}
+                  handlePasswordChange={this.handlePasswordChange}
+                  handleConfirmPasswordChange={this.handleConfirmPasswordChange}
+                  handleRegistrationSubmit={this.handleRegistrationSubmit}
+                />
+              )
+          }} />
+        </Switch>
       </div>
     )
   }
