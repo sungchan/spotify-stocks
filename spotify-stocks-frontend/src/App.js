@@ -1,11 +1,12 @@
 import React from 'react';
-import { Link, Switch, Route } from 'react-router-dom';
+import { Link, Switch, Route, withRouter } from 'react-router-dom';
 
 import api from './services/api';
 
 import RegistrationPage from './containers/RegistrationPage';
 import LoginPage from './containers/LoginPage';
 import Navbar from './containers/Navbar';
+import Portfolio from './containers/Portfolio';
 
 class App extends React.Component {
   state = {
@@ -16,7 +17,8 @@ class App extends React.Component {
     password: undefined,
     confirmPassword: undefined,
     registrationError: false,
-    loginError: false
+    loginError: false,
+    userId: undefined
   }
 
   handleFirstNameChange = (e) => {
@@ -57,10 +59,11 @@ class App extends React.Component {
         password: this.state.password
       }).then(resp => {
         if (resp.error){
-          this.setState({registrationError: resp.error})
+          this.setState({registrationError: resp.error});
         }
       })
       this.setState({registrationError: false});
+      //change registration to logged in status
     };
   }
 
@@ -72,7 +75,9 @@ class App extends React.Component {
       if (resp.error){
         this.setState({loginError: true})
       } else {
-        console.log('success', resp)
+        this.setState({userId: resp.id})
+        console.log('success', resp, this.props)
+        this.props.history.push('/portfolio')
       }
     })
   }
@@ -101,7 +106,7 @@ class App extends React.Component {
               />
             )
           }}/>
-          <Route path='/login' render={() => {
+        <Route path='/login' render={(routerProps) => {
             return (
               <LoginPage
                 email={this.state.email}
@@ -114,10 +119,17 @@ class App extends React.Component {
               />
             )
           }}/>
+        <Route path='/portfolio' render={(router) => {
+            return (
+              <Portfolio
+                email={this.state.email}
+              />
+            )
+          }}/>
         </Switch>
       </div>
     )
   }
 }
 
-export default App;
+export default withRouter(App);

@@ -1,4 +1,5 @@
 const API_BASE = 'http://localhost:3000';
+const ALPHAV_KEY = 'OWWBK978K2C9WC2I';
 
 const addUser = (data) => {
   return fetch(`${API_BASE}/users`, {
@@ -27,7 +28,7 @@ const authUser = (data) => {
       email: data.email,
       password: data.password
     })
-  }).then(resp => resp.json())
+  }).then(resp => resp.json());
 }
 
 const api = {
