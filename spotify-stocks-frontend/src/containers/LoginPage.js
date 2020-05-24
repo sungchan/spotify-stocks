@@ -1,5 +1,6 @@
 import React from 'react';
 import { Form, Button, Message } from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
 
 class LoginPage extends React.Component {
 
@@ -29,6 +30,9 @@ class LoginPage extends React.Component {
                 || !this.props.password
             }
           />
+          <Link to='register'>
+            New user? Click here to register
+          </Link>
         </Form>
       </React.Fragment>
     )

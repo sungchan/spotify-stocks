@@ -1,5 +1,6 @@
 import React from 'react';
 import { Form, Button, Message } from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
 
 class RegistrationPage extends React.Component {
 
@@ -14,11 +15,11 @@ class RegistrationPage extends React.Component {
           </Form.Field>
           <Form.Field>
             <label> E-mail: </label>
-            <input placeholder = 'E-mail' value = {this.props.email} onChange={this.props.handleEmailChange}/>
+            <input placeholder = 'E-mail' value = {this.props.registerEmail} onChange={this.props.handleRegisterEmailChange}/>
           </Form.Field>
           <Form.Field>
             <label> Password: </label>
-            <input placeholder = 'Password' value = {this.props.password} onChange={this.props.handlePasswordChange} type='password'/>
+            <input placeholder = 'Password' value = {this.props.registerPassword} onChange={this.props.handleRegisterPasswordChange} type='password'/>
             <input placeholder = 'Confirm Password' value = {this.props.confirmPassword} onChange={this.props.handleConfirmPasswordChange} type='password'/>
           </Form.Field>
           <Message
@@ -33,12 +34,15 @@ class RegistrationPage extends React.Component {
             type='submit'
             disabled={!this.props.firstName
                 || !this.props.lastName
-                || !this.props.email
-                || !this.props.password
+                || !this.props.registerEmail
+                || !this.props.registerPassword
                 || !this.props.confirmPassword
             }
           />
         </Form>
+        <Link to='login'>
+          Return to Login
+        </Link>
       </React.Fragment>
     )
   }

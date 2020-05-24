@@ -7,16 +7,17 @@ class Navbar extends React.Component {
   render(){
     return (
       <React.Fragment>
-        <Link to='login'>
-          Login
-        </Link>
-        <Link to='register'>
-          Register
-        </Link>
+        {
+          this.props.userId &&
+          <Link to='login' onClick={this.props.handleLogout}>
+            Logout
+          </Link>
+        }
+
 
       </React.Fragment>
     )
   }
 }
 
-export default Navbar; 
+export default Navbar;
