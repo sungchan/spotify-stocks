@@ -17,7 +17,7 @@ const addUser = (data) => {
 }
 
 const authUser = (data) => {
-  fetch(`${API_BASE}/auth`, {
+  return fetch(`${API_BASE}/auth`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

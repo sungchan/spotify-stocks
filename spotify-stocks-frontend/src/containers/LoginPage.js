@@ -6,7 +6,7 @@ class LoginPage extends React.Component {
   render(){
     return (
       <React.Fragment>
-        <Form onSubmit={this.props.handleLoginSubmit}>
+        <Form error={this.props.loginError} onSubmit={this.props.handleLoginSubmit}>
           <Form.Field>
             <label> E-mail: </label>
             <input placeholder = 'E-mail' value = {this.props.email} onChange={this.props.handleEmailChange}/>
@@ -15,6 +15,10 @@ class LoginPage extends React.Component {
             <label> Password: </label>
             <input placeholder = 'Password' value = {this.props.password} onChange={this.props.handlePasswordChange} type='password'/>
           </Form.Field>
+          <Message
+            error
+            content={'Login information is incorrect. Please try again'}
+          />
           <Button
             content='Log In'
             primary
