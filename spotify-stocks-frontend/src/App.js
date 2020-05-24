@@ -11,16 +11,16 @@ import Portfolio from './containers/Portfolio';
 class App extends React.Component {
   state = {
     // *** REGISTRATION STATES ***
-    firstName: undefined,
-    lastName: undefined,
-    registerEmail: undefined,
-    registerPassword: undefined,
-    confirmPassword: undefined,
+    firstName: '',
+    lastName: '',
+    registerEmail: '',
+    registerPassword: '',
+    confirmPassword: '',
     registrationError: false,
     // *** LOGIN STATES ***
-    userId: undefined,
-    email: undefined,
-    password: undefined,
+    userId: '',
+    email: '',
+    password: '',
     loginError: false
   }
 
@@ -73,7 +73,7 @@ class App extends React.Component {
             registrationError: false,
             firstName: resp.first_name,
             lastName: resp.last_name,
-            email: resp.email,
+            email: resp.email
           });
           this.props.history.push('/portfolio');
         }
@@ -104,7 +104,13 @@ class App extends React.Component {
       if (resp.error){
         this.setState({loginError: true});
       } else {
-        this.setState({userId: resp.id});
+        console.log(resp)
+        this.setState({
+          userId: resp.id,
+          firstName: resp.first_name,
+          lastName: resp.last_name,
+          email: resp.email
+        });
         this.props.history.push('/portfolio');
       }
     })
@@ -135,6 +141,8 @@ class App extends React.Component {
       <div>
         <Navbar
           userId={this.state.userId}
+          firstName={this.state.firstName}
+          lastName={this.state.lastName}
 
           handleLogout={this.handleLogout}
         />
