@@ -55,7 +55,11 @@ class App extends React.Component {
         last_name: this.state.lastName,
         email: this.state.email,
         password: this.state.password
-      });
+      }).then(resp => {
+        if (resp.error){
+          this.setState({registrationError: resp.error})
+        }
+      })
       this.setState({registrationError: false});
     };
   }
@@ -68,7 +72,7 @@ class App extends React.Component {
       if (resp.error){
         this.setState({loginError: true})
       } else {
-        console.log('success')
+        console.log('success', resp)
       }
     })
   }
