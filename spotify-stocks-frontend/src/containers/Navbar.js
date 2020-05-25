@@ -9,9 +9,12 @@ class Navbar extends React.Component {
       <React.Fragment>
         {
           this.props.userId &&
-          <Link to='login' onClick={this.props.handleLogout}>
-            Logout
-          </Link>
+          <div>
+            Welcome {this.props.firstName} {this.props.lastName}
+            <Link to='login' onClick={this.props.handleLogout}>
+              Logout
+            </Link>
+          </div>
         }
 
 

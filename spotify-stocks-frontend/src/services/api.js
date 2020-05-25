@@ -31,9 +31,19 @@ const authUser = (data) => {
   }).then(resp => resp.json());
 }
 
+const findCurrentUser = (token) => {
+  return fetch(`${API_BASE}/current_user`, {
+    method: 'GET',
+    headers: {
+      Authenticate: token
+    }
+  }).then(resp => resp.json());
+}
+
 const api = {
   addUser,
-  authUser
+  authUser,
+  findCurrentUser
 }
 
 export default api;
