@@ -4,7 +4,13 @@ class AuthController < ApplicationController
     user = User.find_by(email: params[:email])
 
     if user && user.authenticate(params[:password])
-      render json: {id: user.id, email: user.email, first_name: user.first_name, last_name: user.last_name}
+      render json: {
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        token: issue_token({id: user.id})
+      }
     else
       render json: {error: "Could not authenticate"}, status: 401
     end
@@ -12,8 +18,8 @@ class AuthController < ApplicationController
 
   def show
     token = request.headers['Authenticate']
-
-    user = User.find_by(id: token)
+    decoded_id = JWT.decode(token, 'secret', true, { algorithm: 'HS256'}).first['id']
+    user ||= User.find_by(id: decoded_id)
 
     if user
       render json: {id: user.id, email: user.email, first_name: user.first_name, last_name: user.last_name}

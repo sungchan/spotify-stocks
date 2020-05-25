@@ -24,21 +24,9 @@ class App extends React.Component {
     loginError: false
   }
 
-  componentDidMount(){
-    const token = localStorage.getItem('token')
-    if (token){
-      api.findCurrentUser(token)
-      .then(resp => {
-        this.setState({
-          userId: resp.id,
-          firstName: resp.first_name,
-          lastName: resp.last_name,
-          email: resp.email
 
-        })
-      })
-    }
-  }
+
+
 
   //******************************************************
   // REGISTRATION
@@ -104,6 +92,23 @@ class App extends React.Component {
   // LOGIN/LOGOUT
   //******************************************************
 
+  componentDidMount(){
+    const token = localStorage.getItem('token')
+    if (token){
+      api.findCurrentUser(token)
+      .then(resp => {
+        this.setState({
+          userId: resp.id,
+          firstName: resp.first_name,
+          lastName: resp.last_name,
+          email: resp.email
+        })
+      })
+    } else {
+      this.props.history.push('/login');
+    }
+  }
+
   handleEmailChange = (e) => {
     e.preventDefault();
     this.setState({email: e.target.value});
@@ -129,7 +134,7 @@ class App extends React.Component {
           lastName: resp.last_name,
           email: resp.email
         });
-        localStorage.setItem('token', this.state.userId)
+        localStorage.setItem('token', resp.token);
         this.props.history.push('/portfolio');
       }
     })
@@ -154,6 +159,11 @@ class App extends React.Component {
   //******************************************************
   // PORTFOLIO
   //******************************************************
+
+
+
+
+
 
   render(){
     console.log(this.state)
