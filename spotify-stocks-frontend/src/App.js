@@ -113,6 +113,7 @@ class App extends React.Component {
     if (token){
       api.findCurrentUser(token)
       .then(resp => {
+        console.log(resp)
         this.setState({
           userId: resp.id,
           firstName: resp.first_name,

@@ -1,5 +1,5 @@
 class TransactionSerializer < ActiveModel::Serializer
-  attributes :id, :quantity, :price, :owned_stock, :name, :symbol
+  attributes :id, :quantity, :price, :name, :symbol
   # belongs_to :user, foreign_key: 'user_id'
   # belongs_to :owned_stock, foreign_key: 'owned_stock_id'
 
