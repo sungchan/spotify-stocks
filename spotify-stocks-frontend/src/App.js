@@ -1,5 +1,7 @@
 import React from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
+import _ from 'lodash';
+
 
 import api from './services/api';
 
@@ -18,10 +20,18 @@ class App extends React.Component {
     confirmPassword: '',
     registrationError: false,
     // *** LOGIN STATES ***
-    // userId: '',
     email: '',
     password: '',
-    loginError: false
+    loginError: false,
+    // *** STOCK SEARCH ***
+    symbol: '',
+    isLoading: false,
+    results: [],
+    stockName: '',
+    openingPrice: null,
+    closingPrice: null,
+    latestPrice: null
+
   }
 
 
@@ -160,13 +170,44 @@ class App extends React.Component {
   // PORTFOLIO
   //******************************************************
 
+  handleSearchChange = (e, { value }) => {
+    console.log(value)
 
+    this.setState({ symbol:value }, ()=> {
+      api.grabStock(this.state.symbol)
+      .then(resp => {
+        console.log(resp)
+        this.setState({results: resp.bestMatches})
+      })
+    })
+  }
 
+  handleResultSelect = (e, data) => {
+    console.log(data.result)
+    this.setState({
+      symbol: data.result['1. symbol'],
+      stockName: data.result['2. name'],
+      openingPrice: data.result['5. marketOpen'],
+      closingPrice: data.result['6. marketClose']
+    }, () => {
+      api.fetchStockInfo(this.state.symbol)
+      .then(resp => {
+        console.log(resp['Meta Data'])
+        console.log(resp['Time Series (1min)'])
+        console.log(resp)
+        // this.setState({latestPrice: })
+      })
+    })
 
+  }
+  //******************************************************
+  // TRANSACTIONS
+  //******************************************************
 
+  //grab transactions
 
   render(){
-    console.log(this.state)
+    // console.log(this.state)
     return (
       <div>
         <Navbar
@@ -180,43 +221,48 @@ class App extends React.Component {
           {!this.state.userId &&
             <React.Fragment>
               <Route path='/register' render={() => {
-                  return (
-                    <RegistrationPage
-                      firstName={this.state.firstName}
-                      lastName={this.state.lastName}
-                      registerEmail={this.state.registerEmail}
-                      registerPassword={this.state.registerPassword}
-                      confirmPassword={this.state.confirmPassword}
-                      registrationError={this.state.registrationError}
+                return (
+                  <RegistrationPage
+                    firstName={this.state.firstName}
+                    lastName={this.state.lastName}
+                    registerEmail={this.state.registerEmail}
+                    registerPassword={this.state.registerPassword}
+                    confirmPassword={this.state.confirmPassword}
+                    registrationError={this.state.registrationError}
 
-                      handleFirstNameChange={this.handleFirstNameChange}
-                      handleLastNameChange={this.handleLastNameChange}
-                      handleRegisterEmailChange={this.handleRegisterEmailChange}
-                      handleRegisterPasswordChange={this.handleRegisterPasswordChange}
-                      handleConfirmPasswordChange={this.handleConfirmPasswordChange}
-                      handleRegistrationSubmit={this.handleRegistrationSubmit}
-                      />
-                  )
-                }}/>
-                <Route path='/login' render={(routerProps) => {
-                    return (
-                      <LoginPage
-                        email={this.state.email}
-                        password={this.state.password}
-                        loginError={this.state.loginError}
+                    handleFirstNameChange={this.handleFirstNameChange}
+                    handleLastNameChange={this.handleLastNameChange}
+                    handleRegisterEmailChange={this.handleRegisterEmailChange}
+                    handleRegisterPasswordChange={this.handleRegisterPasswordChange}
+                    handleConfirmPasswordChange={this.handleConfirmPasswordChange}
+                    handleRegistrationSubmit={this.handleRegistrationSubmit}
+                    />
+                )
+              }}/>
+              <Route path='/login' render={(routerProps) => {
+                return (
+                  <LoginPage
+                    email={this.state.email}
+                    password={this.state.password}
+                    loginError={this.state.loginError}
 
-                        handleEmailChange={this.handleEmailChange}
-                        handlePasswordChange={this.handlePasswordChange}
-                        handleLoginSubmit={this.handleLoginSubmit}
-                        />
-                    )
-                  }}/>
+                    handleEmailChange={this.handleEmailChange}
+                    handlePasswordChange={this.handlePasswordChange}
+                    handleLoginSubmit={this.handleLoginSubmit}
+                  />
+                )
+              }}/>
             </React.Fragment>
-        }
-        <Route path='/portfolio' render={(router) => {
+          }
+          <Route path='/portfolio' render={(router) => {
             return (
               <Portfolio
-                email={this.state.email}
+                symbol={this.state.symbol}
+                isLoading={this.state.isLoading}
+                results={this.state.results}
+
+                handleSearchChange={this.handleSearchChange}
+                handleResultSelect={this.handleResultSelect}
               />
             )
           }}/>
