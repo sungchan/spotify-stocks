@@ -1,6 +1,5 @@
 import React from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
-import { Modal } from 'semantic-ui-react'
 
 import api from './services/api';
 
@@ -113,21 +112,22 @@ class App extends React.Component {
     if (token){
       api.findCurrentUser(token)
       .then(resp => {
+        console.log(resp)
         this.setState({
           userId: resp.id,
           firstName: resp.first_name,
           lastName: resp.last_name,
           email: resp.email,
           balance: resp.balance,
-          purchaseQuantity: null,
-          transactions: resp.transactions,
-          ownedStocks: resp.owned_stocks,
+          purchaseQuantity: '',
+          ownedStocks:resp.owned_stocks
         })
       })
     } else {
       this.props.history.push('/login');
     }
   }
+
 
   handleEmailChange = (e) => {
     e.preventDefault();
@@ -180,38 +180,37 @@ class App extends React.Component {
   }
 
   //******************************************************
-  // PORTFOLIO
+  // SEARCH
   //******************************************************
 
   handleSearchChange = (e, { value }) => {
-    console.log(value)
-
     this.setState({ symbol:value }, ()=> {
       api.grabStock(this.state.symbol)
       .then(resp => {
-        console.log(resp)
-        this.setState({results: resp.bestMatches})
+        this.setState({results: resp})
       })
     })
   }
 
   handleResultSelect = (e, data) => {
-    console.log(data.result)
+    e.preventDefault();
     this.setState({
-      symbol: data.result['1. symbol'],
-      stockName: data.result['2. name'],
+      symbol: data.result['symbol'],
+      stockName: data.result['name'],
     }, () => {
       api.fetchStockInfo(this.state.symbol)
       .then(resp => {
-        console.log(resp)
-        console.log(resp['Global Quote']['05. price'])
-        this.setState({
-          latestPrice: resp['Global Quote']['05. price'],
-          openingPrice: resp['Global Quote']['02. open'],
-        })
+        if(!resp['Error Message']){
+          this.setState({
+            latestPrice: resp['Global Quote']['05. price'],
+            openingPrice: resp['Global Quote']['02. open']
+          })
+        } else {
+          alert('Stock not found')
+        }
       })
     })
-
+    this.setState({ purchaseQuantity: ''})
   }
   //******************************************************
   // TRANSACTIONS
@@ -219,7 +218,6 @@ class App extends React.Component {
 
   handlePurchase = (e) => {
     e.preventDefault();
-
     let total;
     const numberRegex = /^[0-9\b]+$/;
 
@@ -235,9 +233,9 @@ class App extends React.Component {
     }
   }
 
-  handlePurchaseSubmit = () => {
+  handlePurchaseSubmit = (e) => {
+    e.preventDefault();
     this.setState({totalPrice: (this.state.latestPrice * this.state.purchaseQuantity).toFixed(2)}, () => {
-      console.log('here')
       api.buyStocks({
         userId: this.state.userId,
         symbol: this.state.symbol,
@@ -248,10 +246,26 @@ class App extends React.Component {
       }).then(resp => this.setState({
         totalQuantity: resp['ownedStock']['total_quantity'],
         balance: resp['balance']
+      }, () => {
+        this.handlePortfolioFetch()
       })
-    )})
+    )}, () => this.setState({purchaseQuantity: ''}))
+  }
+  //******************************************************
+  // PORTFOLIO
+  //******************************************************
+
+  handlePortfolioFetch = () => {
+    api.portfolioFetch(this.state.userId)
+    .then(resp => {
+      this.setState({ ownedStocks: resp.owned_stocks})
+    })
   }
 
+  updatePortfolioPrice = (symbol) => {
+    api.fetchStockInfo(symbol)
+    .then(resp => console.log(resp))
+  }
 
   //******************************************************
   // render
@@ -319,11 +333,14 @@ class App extends React.Component {
                 totalPrice={this.state.totalPrice}
                 enoughFunds={this.state.enoughFunds}
                 totalQuantity={this.state.totalQuantity}
+                ownedStocks={this.state.ownedStocks}
 
+                handlePortfolioFetch={this.handlePortfolioFetch}
                 handleSearchChange={this.handleSearchChange}
                 handleResultSelect={this.handleResultSelect}
                 handlePurchase={this.handlePurchase}
                 handlePurchaseSubmit={this.handlePurchaseSubmit}
+                updatePortfolioPrice={this.updatePortfolioPrice}
               />
             )
           }}/>

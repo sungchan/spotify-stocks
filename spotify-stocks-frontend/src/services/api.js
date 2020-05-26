@@ -44,6 +44,12 @@ const findCurrentUser = (token) => {
   }).then(resp => resp.json())
 }
 
+const portfolioFetch = (id) => {
+  return fetch(`${API_BASE}/users/${id}`, {
+    method: 'GET'
+  }).then(resp => resp.json())
+}
+
 //******************************************************
 // STOCK TRANSACTIONS
 //******************************************************
@@ -71,19 +77,21 @@ const buyStocks = (data) => {
 // ALPHAVANTAGE API
 //******************************************************
 
-const grabStock = (searchQuery) => {
-  return fetch(`https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${searchQuery}&apikey=${ALPHAV_KEY}`, {
-    method: 'GET'
-  }).then(resp => resp.json());
-}
-
-// USED FOR INDIRECT SEARCH WITH UNLIMITED SEARCH
+// LIMITED SEARCH FUNCTIONALITY
 // *****************************
 // const grabStock = (searchQuery) => {
-//   return fetch(`https://ticker-2e1ica8b9.now.sh/keyword/${searchQuery}`, {
+//   return fetch(`https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${searchQuery}&apikey=${ALPHAV_KEY}`, {
 //     method: 'GET'
 //   }).then(resp => resp.json());
 // }
+
+// USED FOR INDIRECT SEARCH WITH UNLIMITED SEARCH
+// *****************************
+const grabStock = (searchQuery) => {
+  return fetch(`https://ticker-2e1ica8b9.now.sh/keyword/${searchQuery}`, {
+    method: 'GET'
+  }).then(resp => resp.json());
+}
 
 
 const fetchStockInfo = (symbol) => {
@@ -99,7 +107,8 @@ const api = {
   findCurrentUser,
   buyStocks,
   grabStock,
-  fetchStockInfo
+  fetchStockInfo,
+  portfolioFetch
 }
 
 export default api;

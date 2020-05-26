@@ -17,9 +17,7 @@ class BuyStocks extends React.Component {
         <Popup  content='You do not have enough funds' disabled={this.props.enoughFunds || this.props.purchaseQuantity === 0} trigger={
           <span>
             <Modal
-              trigger={
-                <Button icon={'cart'} disabled={!this.props.enoughFunds || !this.props.purchaseQuantity } content={'Purchase'} onClick={this.props.handlePurchaseSubmit}/>
-              }
+              trigger={<Button icon={'cart'} disabled={!this.props.enoughFunds || !this.props.purchaseQuantity } content={'Purchase'} onClick={this.props.handlePurchaseSubmit}/>}
               content={`You have just purchased ${this.props.purchaseQuantity} stock(s) of ${this.props.symbol} and now own a total of ${this.props.totalQuantity}`}
             />
           </span>}
