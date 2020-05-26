@@ -8,7 +8,7 @@ class AuthController < ApplicationController
         total_quantity: OwnedStock.find_by(id: d.owned_stock_id).total_quantity,
         total_value: OwnedStock.find_by(id: d.owned_stock_id).total_value
       }
-    end
+    end.uniq
   end
 
   def create

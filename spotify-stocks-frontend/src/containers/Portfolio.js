@@ -3,22 +3,28 @@ import { Search, Button, Label } from 'semantic-ui-react';
 
 import StockInfo from '../components/StockInfo.js';
 import BuyStocks from '../components/BuyStocks.js';
+import ShowPortfolio from '../components/ShowPortfolio.js';
 
+//SEARCH PROP FUNCTION- DETERMINES SEARCH RESULT FORMAT
 const resultRenderer = ( data ) => {
-  console.log(data['1. symbol'])
   return(
     <div>
-      {data['1. symbol']} - {data['2. name']}
+      {data['symbol']} - {data['name']}
     </div>
   )
 }
 
-class Portfolio extends React.Component {
 
+
+class Portfolio extends React.Component {
 
   render(){
     return (
       <React.Fragment>
+        <ShowPortfolio
+          ownedStocks={this.props.ownedStocks}
+          updatePortfolioPrice={this.props.updatePortfolioPrice}
+        />
         <Search
           placeholder={'Search by symbol or name'}
           resultRenderer = {resultRenderer}
@@ -28,9 +34,6 @@ class Portfolio extends React.Component {
           onSearchChange={this.props.handleSearchChange}
           onResultSelect={this.props.handleResultSelect}
         />
-        <div>
-          hello
-        </div>
         <StockInfo
           openingPrice={this.props.openingPrice}
           stockName={this.props.stockName}
