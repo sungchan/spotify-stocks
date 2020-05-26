@@ -1,7 +1,8 @@
 import React from 'react';
 import { Search, Button, Label } from 'semantic-ui-react';
-import _ from 'lodash';
-import PropTypes from 'prop-types'
+
+import StockInfo from '../components/StockInfo.js';
+import BuyStocks from '../components/BuyStocks.js';
 
 const resultRenderer = ( data ) => {
   console.log(data['1. symbol'])
@@ -30,6 +31,16 @@ class Portfolio extends React.Component {
         <div>
           hello
         </div>
+        <StockInfo
+          openingPrice={this.props.openingPrice}
+          stockName={this.props.stockName}
+          latestPrice={this.props.latestPrice}
+        />
+      <br/>
+        <BuyStocks
+          purchaseQuantity={this.props.purchaseQuantity}
+          handlePurchaseQuantity={this.props.handlePurchaseQuantity}
+        />
       </React.Fragment>
     )
   }

@@ -63,7 +63,7 @@ const grabStock = (searchQuery) => {
 }
 
 const fetchStockInfo = (symbol) => {
-  return fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=1min&apikey=${ALPHAV_KEY}`, {
+  return fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${ALPHAV_KEY}`, {
     method: 'GET'
   }).then(resp => resp.json());
 }

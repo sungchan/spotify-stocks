@@ -1,7 +1,5 @@
 import React from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
-import _ from 'lodash';
-
 
 import api from './services/api';
 
@@ -24,14 +22,13 @@ class App extends React.Component {
     password: '',
     loginError: false,
     // *** STOCK SEARCH ***
-    symbol: '',
+    symbol: 'TSLA',
     isLoading: false,
     results: [],
-    stockName: '',
-    openingPrice: null,
-    closingPrice: null,
-    latestPrice: null
-
+    stockName: 'Tesla',
+    openingPrice: '822.1735',
+    latestPrice: "822.1735",
+    purchaseQuantity: 0
   }
 
 
@@ -187,15 +184,16 @@ class App extends React.Component {
     this.setState({
       symbol: data.result['1. symbol'],
       stockName: data.result['2. name'],
-      openingPrice: data.result['5. marketOpen'],
-      closingPrice: data.result['6. marketClose']
     }, () => {
       api.fetchStockInfo(this.state.symbol)
       .then(resp => {
-        console.log(resp['Meta Data'])
-        console.log(resp['Time Series (1min)'])
         console.log(resp)
-        // this.setState({latestPrice: })
+        console.log(resp['Global Quote']['05. price'])
+        this.setState({
+          latestPrice: resp['Global Quote']['05. price'],
+          openingPrice: resp['Global Quote']['02. open'],
+          openingPrice: resp['Global Quote']
+        })
       })
     })
 
@@ -203,6 +201,20 @@ class App extends React.Component {
   //******************************************************
   // TRANSACTIONS
   //******************************************************
+
+  handlePurchaseQuantity = (e) => {
+    e.preventDefault();
+
+    const numberRegex = /^[0-9\b]+$/;
+
+    if (numberRegex.test(e.target.value)){
+
+      console.log(e.target.value)
+      this.setState({purchaseQuantity: e.target.value});
+    }
+  }
+
+
 
   //grab transactions
 
@@ -260,9 +272,15 @@ class App extends React.Component {
                 symbol={this.state.symbol}
                 isLoading={this.state.isLoading}
                 results={this.state.results}
+                openingPrice={this.state.openingPrice}
+                closingPrice={this.state.closingPrice}
+                latestPrice={this.state.latestPrice}
+                stockName={this.state.stockName}
+                purchaseQuantity={this.state.purchaseQuantity}
 
                 handleSearchChange={this.handleSearchChange}
                 handleResultSelect={this.handleResultSelect}
+                handlePurchaseQuantity={this.handlePurchaseQuantity}
               />
             )
           }}/>
