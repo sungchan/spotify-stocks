@@ -1,5 +1,6 @@
 import React from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
+import { Modal } from 'semantic-ui-react'
 
 import api from './services/api';
 
@@ -18,10 +19,13 @@ class App extends React.Component {
     confirmPassword: '',
     registrationError: false,
     // *** LOGIN STATES ***
+    userId: null,
     email: '',
     password: '',
     loginError: false,
     balance: null,
+    transactions: [],
+    ownedStocks: [],
     // *** STOCK SEARCH ***
     symbol: 'TSLA',
     isLoading: false,
@@ -32,7 +36,8 @@ class App extends React.Component {
     // *** BUYING STOCKS
     purchaseQuantity: null,
     enoughFunds: false,
-    totalPrice: null
+    totalPrice: null,
+    totalQuantity: null
   }
 
 
@@ -113,7 +118,10 @@ class App extends React.Component {
           firstName: resp.first_name,
           lastName: resp.last_name,
           email: resp.email,
-          balance: resp.balance
+          balance: resp.balance,
+          purchaseQuantity: null,
+          transactions: resp.transactions,
+          ownedStocks: resp.owned_stocks,
         })
       })
     } else {
@@ -145,7 +153,9 @@ class App extends React.Component {
           firstName: resp.first_name,
           lastName: resp.last_name,
           email: resp.email,
-          balance: resp.balance
+          balance: resp.balance,
+          transactions: resp.transactions,
+          ownedStocks: resp.owned_stocks
         });
         localStorage.setItem('token', resp.token);
         this.props.history.push('/portfolio');
@@ -198,7 +208,6 @@ class App extends React.Component {
         this.setState({
           latestPrice: resp['Global Quote']['05. price'],
           openingPrice: resp['Global Quote']['02. open'],
-          openingPrice: resp['Global Quote']
         })
       })
     })
@@ -224,15 +233,31 @@ class App extends React.Component {
     } else {
       this.setState({enoughFunds: true});
     }
+  }
 
+  handlePurchaseSubmit = () => {
+    this.setState({totalPrice: (this.state.latestPrice * this.state.purchaseQuantity).toFixed(2)}, () => {
+      console.log('here')
+      api.buyStocks({
+        userId: this.state.userId,
+        symbol: this.state.symbol,
+        stockName: this.state.stockName,
+        latestPrice: this.state.latestPrice,
+        purchaseQuantity: this.state.purchaseQuantity,
+        totalPrice: this.state.totalPrice
+      }).then(resp => this.setState({
+        totalQuantity: resp['ownedStock']['total_quantity'],
+        balance: resp['balance']
+      })
+    )})
   }
 
 
-
-
-
+  //******************************************************
+  // render
+  //******************************************************
   render(){
-    console.log(this.state.enoughFunds)
+    console.log(this.state)
     return (
       <div>
         <Navbar
@@ -293,10 +318,12 @@ class App extends React.Component {
                 balance={this.state.balance}
                 totalPrice={this.state.totalPrice}
                 enoughFunds={this.state.enoughFunds}
+                totalQuantity={this.state.totalQuantity}
 
                 handleSearchChange={this.handleSearchChange}
                 handleResultSelect={this.handleResultSelect}
                 handlePurchase={this.handlePurchase}
+                handlePurchaseSubmit={this.handlePurchaseSubmit}
               />
             )
           }}/>

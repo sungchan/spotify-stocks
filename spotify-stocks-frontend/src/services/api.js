@@ -2,7 +2,7 @@ const API_BASE = 'http://localhost:3000';
 const ALPHAV_KEY = 'OWWBK978K2C9WC2I';
 
 //******************************************************
-// BACKEND
+// USER
 //******************************************************
 
 const addUser = (data) => {
@@ -32,7 +32,7 @@ const authUser = (data) => {
       email: data.email,
       password: data.password
     })
-  }).then(resp => resp.json());
+  }).then(resp => resp.json())
 }
 
 const findCurrentUser = (token) => {
@@ -41,14 +41,43 @@ const findCurrentUser = (token) => {
     headers: {
       Authenticate: token
     }
-  }).then(resp => resp.json());
+  }).then(resp => resp.json())
 }
+
+//******************************************************
+// STOCK TRANSACTIONS
+//******************************************************
+
+const buyStocks = (data) => {
+  return fetch(`${API_BASE}/owned_stocks`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify({
+      symbol: data.symbol,
+      quantity: data.purchaseQuantity,
+      stockName: data.stockName,
+      latestPrice: data.latestPrice,
+      userId: data.userId,
+      totalPrice: data.totalPrice
+    })
+  }).then(resp => resp.json())
+}
+
 
 //******************************************************
 // ALPHAVANTAGE API
 //******************************************************
 
-// USED FOR INDIRECT SEARCH WITHOUT LIMITS
+const grabStock = (searchQuery) => {
+  return fetch(`https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${searchQuery}&apikey=${ALPHAV_KEY}`, {
+    method: 'GET'
+  }).then(resp => resp.json());
+}
+
+// USED FOR INDIRECT SEARCH WITH UNLIMITED SEARCH
 // *****************************
 // const grabStock = (searchQuery) => {
 //   return fetch(`https://ticker-2e1ica8b9.now.sh/keyword/${searchQuery}`, {
@@ -56,11 +85,6 @@ const findCurrentUser = (token) => {
 //   }).then(resp => resp.json());
 // }
 
-const grabStock = (searchQuery) => {
-  return fetch(`https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${searchQuery}&apikey=${ALPHAV_KEY}`, {
-    method: 'GET'
-  }).then(resp => resp.json());
-}
 
 const fetchStockInfo = (symbol) => {
   return fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${ALPHAV_KEY}`, {
@@ -73,6 +97,7 @@ const api = {
   addUser,
   authUser,
   findCurrentUser,
+  buyStocks,
   grabStock,
   fetchStockInfo
 }

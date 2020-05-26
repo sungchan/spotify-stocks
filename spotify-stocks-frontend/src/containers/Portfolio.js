@@ -43,6 +43,8 @@ class Portfolio extends React.Component {
           balance={this.props.balance}
           totalPrice={this.props.totalPrice}
           enoughFunds={this.props.enoughFunds}
+          totalQuantity={this.props.totalQuantity}
+          symbol={this.props.symbol}
 
           handlePurchase={this.props.handlePurchase}
           handlePurchaseSubmit={this.props.handlePurchaseSubmit}

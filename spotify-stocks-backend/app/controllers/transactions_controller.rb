@@ -1,5 +1,8 @@
 class TransactionsController < ApplicationController
 
+  def user_id
+    self.user_id
+  end
   # GET /transactions
   def index
     @transactions = Transaction.all
@@ -9,7 +12,8 @@ class TransactionsController < ApplicationController
 
   # GET /transactions/1
   def show
-    render json: @transaction
+    @transactions = Transaction.where(user_id: params[:userId])
+    render json: @transactions
   end
 
   # POST /transactions
