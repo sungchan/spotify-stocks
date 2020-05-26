@@ -120,9 +120,7 @@ class App extends React.Component {
           lastName: resp.last_name,
           email: resp.email,
           balance: resp.balance,
-          purchaseQuantity: null,
-          transactions: resp.transactions,
-          ownedStocks: resp.owned_stocks,
+          purchaseQuantity: null
         })
       })
     } else {
@@ -209,6 +207,7 @@ class App extends React.Component {
         this.setState({
           latestPrice: resp['Global Quote']['05. price'],
           openingPrice: resp['Global Quote']['02. open'],
+          purchaseQuantity: null
         })
       })
     })
