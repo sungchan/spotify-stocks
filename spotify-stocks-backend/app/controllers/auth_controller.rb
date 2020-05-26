@@ -9,6 +9,7 @@ class AuthController < ApplicationController
         email: user.email,
         first_name: user.first_name,
         last_name: user.last_name,
+        balance: user.balance,
         token: issue_token({id: user.id})
       }
     else
@@ -22,7 +23,13 @@ class AuthController < ApplicationController
     user ||= User.find_by(id: decoded_id)
 
     if user
-      render json: {id: user.id, email: user.email, first_name: user.first_name, last_name: user.last_name}
+      render json: {
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        balance: user.balance
+      }
     else
       render json: {error: "Could not authenticate"}, status: 401
     end

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
+import { Modal } from 'semantic-ui-react'
 
 import api from './services/api';
 
@@ -18,10 +19,25 @@ class App extends React.Component {
     confirmPassword: '',
     registrationError: false,
     // *** LOGIN STATES ***
-    // userId: '',
+    userId: null,
     email: '',
     password: '',
-    loginError: false
+    loginError: false,
+    balance: null,
+    transactions: [],
+    ownedStocks: [],
+    // *** STOCK SEARCH ***
+    symbol: 'TSLA',
+    isLoading: false,
+    results: [],
+    stockName: 'Tesla',
+    openingPrice: '822.1735',
+    latestPrice: "822.1735",
+    // *** BUYING STOCKS
+    purchaseQuantity: null,
+    enoughFunds: false,
+    totalPrice: null,
+    totalQuantity: null
   }
 
 
@@ -101,7 +117,11 @@ class App extends React.Component {
           userId: resp.id,
           firstName: resp.first_name,
           lastName: resp.last_name,
-          email: resp.email
+          email: resp.email,
+          balance: resp.balance,
+          purchaseQuantity: null,
+          transactions: resp.transactions,
+          ownedStocks: resp.owned_stocks,
         })
       })
     } else {
@@ -132,7 +152,10 @@ class App extends React.Component {
           userId: resp.id,
           firstName: resp.first_name,
           lastName: resp.last_name,
-          email: resp.email
+          email: resp.email,
+          balance: resp.balance,
+          transactions: resp.transactions,
+          ownedStocks: resp.owned_stocks
         });
         localStorage.setItem('token', resp.token);
         this.props.history.push('/portfolio');
@@ -160,11 +183,79 @@ class App extends React.Component {
   // PORTFOLIO
   //******************************************************
 
+  handleSearchChange = (e, { value }) => {
+    console.log(value)
+
+    this.setState({ symbol:value }, ()=> {
+      api.grabStock(this.state.symbol)
+      .then(resp => {
+        console.log(resp)
+        this.setState({results: resp.bestMatches})
+      })
+    })
+  }
+
+  handleResultSelect = (e, data) => {
+    console.log(data.result)
+    this.setState({
+      symbol: data.result['1. symbol'],
+      stockName: data.result['2. name'],
+    }, () => {
+      api.fetchStockInfo(this.state.symbol)
+      .then(resp => {
+        console.log(resp)
+        console.log(resp['Global Quote']['05. price'])
+        this.setState({
+          latestPrice: resp['Global Quote']['05. price'],
+          openingPrice: resp['Global Quote']['02. open'],
+        })
+      })
+    })
+
+  }
+  //******************************************************
+  // TRANSACTIONS
+  //******************************************************
+
+  handlePurchase = (e) => {
+    e.preventDefault();
+
+    let total;
+    const numberRegex = /^[0-9\b]+$/;
+
+    if (e.target.value === '' || numberRegex.test(e.target.value)){
+      this.setState({purchaseQuantity: e.target.value})
+      total = (this.state.latestPrice * e.target.value).toFixed(2)
+    }
+
+    if (total > parseFloat(this.state.balance)){
+      this.setState({enoughFunds: false});
+    } else {
+      this.setState({enoughFunds: true});
+    }
+  }
+
+  handlePurchaseSubmit = () => {
+    this.setState({totalPrice: (this.state.latestPrice * this.state.purchaseQuantity).toFixed(2)}, () => {
+      console.log('here')
+      api.buyStocks({
+        userId: this.state.userId,
+        symbol: this.state.symbol,
+        stockName: this.state.stockName,
+        latestPrice: this.state.latestPrice,
+        purchaseQuantity: this.state.purchaseQuantity,
+        totalPrice: this.state.totalPrice
+      }).then(resp => this.setState({
+        totalQuantity: resp['ownedStock']['total_quantity'],
+        balance: resp['balance']
+      })
+    )})
+  }
 
 
-
-
-
+  //******************************************************
+  // render
+  //******************************************************
   render(){
     console.log(this.state)
     return (
@@ -180,43 +271,59 @@ class App extends React.Component {
           {!this.state.userId &&
             <React.Fragment>
               <Route path='/register' render={() => {
-                  return (
-                    <RegistrationPage
-                      firstName={this.state.firstName}
-                      lastName={this.state.lastName}
-                      registerEmail={this.state.registerEmail}
-                      registerPassword={this.state.registerPassword}
-                      confirmPassword={this.state.confirmPassword}
-                      registrationError={this.state.registrationError}
+                return (
+                  <RegistrationPage
+                    firstName={this.state.firstName}
+                    lastName={this.state.lastName}
+                    registerEmail={this.state.registerEmail}
+                    registerPassword={this.state.registerPassword}
+                    confirmPassword={this.state.confirmPassword}
+                    registrationError={this.state.registrationError}
 
-                      handleFirstNameChange={this.handleFirstNameChange}
-                      handleLastNameChange={this.handleLastNameChange}
-                      handleRegisterEmailChange={this.handleRegisterEmailChange}
-                      handleRegisterPasswordChange={this.handleRegisterPasswordChange}
-                      handleConfirmPasswordChange={this.handleConfirmPasswordChange}
-                      handleRegistrationSubmit={this.handleRegistrationSubmit}
-                      />
-                  )
-                }}/>
-                <Route path='/login' render={(routerProps) => {
-                    return (
-                      <LoginPage
-                        email={this.state.email}
-                        password={this.state.password}
-                        loginError={this.state.loginError}
+                    handleFirstNameChange={this.handleFirstNameChange}
+                    handleLastNameChange={this.handleLastNameChange}
+                    handleRegisterEmailChange={this.handleRegisterEmailChange}
+                    handleRegisterPasswordChange={this.handleRegisterPasswordChange}
+                    handleConfirmPasswordChange={this.handleConfirmPasswordChange}
+                    handleRegistrationSubmit={this.handleRegistrationSubmit}
+                    />
+                )
+              }}/>
+              <Route path='/login' render={(routerProps) => {
+                return (
+                  <LoginPage
+                    email={this.state.email}
+                    password={this.state.password}
+                    loginError={this.state.loginError}
 
-                        handleEmailChange={this.handleEmailChange}
-                        handlePasswordChange={this.handlePasswordChange}
-                        handleLoginSubmit={this.handleLoginSubmit}
-                        />
-                    )
-                  }}/>
+                    handleEmailChange={this.handleEmailChange}
+                    handlePasswordChange={this.handlePasswordChange}
+                    handleLoginSubmit={this.handleLoginSubmit}
+                  />
+                )
+              }}/>
             </React.Fragment>
-        }
-        <Route path='/portfolio' render={(router) => {
+          }
+          <Route path='/portfolio' render={(router) => {
             return (
               <Portfolio
-                email={this.state.email}
+                symbol={this.state.symbol}
+                isLoading={this.state.isLoading}
+                results={this.state.results}
+                openingPrice={this.state.openingPrice}
+                closingPrice={this.state.closingPrice}
+                latestPrice={this.state.latestPrice}
+                stockName={this.state.stockName}
+                purchaseQuantity={this.state.purchaseQuantity}
+                balance={this.state.balance}
+                totalPrice={this.state.totalPrice}
+                enoughFunds={this.state.enoughFunds}
+                totalQuantity={this.state.totalQuantity}
+
+                handleSearchChange={this.handleSearchChange}
+                handleResultSelect={this.handleResultSelect}
+                handlePurchase={this.handlePurchase}
+                handlePurchaseSubmit={this.handlePurchaseSubmit}
               />
             )
           }}/>
