@@ -7,9 +7,11 @@ class StockInfo extends React.Component {
   render(){
     return (
       <React.Fragment>
-        Opening Price: {this.props.openingPrice}<br/>
-        Current Price: {this.props.latestPrice}
         Name: {this.props.stockName}
+          <br/>
+        Opening Price: ${(parseFloat(this.props.openingPrice)).toFixed(2)}
+          <br/>
+        Current Price: ${(parseFloat(this.props.latestPrice)).toFixed(2)}
       </React.Fragment>
     )
   }

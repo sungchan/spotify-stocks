@@ -21,6 +21,7 @@ class App extends React.Component {
     email: '',
     password: '',
     loginError: false,
+    balance: null,
     // *** STOCK SEARCH ***
     symbol: 'TSLA',
     isLoading: false,
@@ -28,7 +29,10 @@ class App extends React.Component {
     stockName: 'Tesla',
     openingPrice: '822.1735',
     latestPrice: "822.1735",
-    purchaseQuantity: 0
+    // *** BUYING STOCKS
+    purchaseQuantity: null,
+    enoughFunds: false,
+    totalPrice: null
   }
 
 
@@ -108,7 +112,8 @@ class App extends React.Component {
           userId: resp.id,
           firstName: resp.first_name,
           lastName: resp.last_name,
-          email: resp.email
+          email: resp.email,
+          balance: resp.balance
         })
       })
     } else {
@@ -139,7 +144,8 @@ class App extends React.Component {
           userId: resp.id,
           firstName: resp.first_name,
           lastName: resp.last_name,
-          email: resp.email
+          email: resp.email,
+          balance: resp.balance
         });
         localStorage.setItem('token', resp.token);
         this.props.history.push('/portfolio');
@@ -202,24 +208,31 @@ class App extends React.Component {
   // TRANSACTIONS
   //******************************************************
 
-  handlePurchaseQuantity = (e) => {
+  handlePurchase = (e) => {
     e.preventDefault();
 
+    let total;
     const numberRegex = /^[0-9\b]+$/;
 
-    if (numberRegex.test(e.target.value)){
-
-      console.log(e.target.value)
-      this.setState({purchaseQuantity: e.target.value});
+    if (e.target.value === '' || numberRegex.test(e.target.value)){
+      this.setState({purchaseQuantity: e.target.value})
+      total = (this.state.latestPrice * e.target.value).toFixed(2)
     }
+
+    if (total > parseFloat(this.state.balance)){
+      this.setState({enoughFunds: false});
+    } else {
+      this.setState({enoughFunds: true});
+    }
+
   }
 
 
 
-  //grab transactions
+
 
   render(){
-    // console.log(this.state)
+    console.log(this.state.enoughFunds)
     return (
       <div>
         <Navbar
@@ -277,10 +290,13 @@ class App extends React.Component {
                 latestPrice={this.state.latestPrice}
                 stockName={this.state.stockName}
                 purchaseQuantity={this.state.purchaseQuantity}
+                balance={this.state.balance}
+                totalPrice={this.state.totalPrice}
+                enoughFunds={this.state.enoughFunds}
 
                 handleSearchChange={this.handleSearchChange}
                 handleResultSelect={this.handleResultSelect}
-                handlePurchaseQuantity={this.handlePurchaseQuantity}
+                handlePurchase={this.handlePurchase}
               />
             )
           }}/>

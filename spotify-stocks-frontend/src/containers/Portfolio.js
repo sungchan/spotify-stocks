@@ -21,11 +21,11 @@ class Portfolio extends React.Component {
       <React.Fragment>
         <Search
           placeholder={'Search by symbol or name'}
-          loading={this.props.isLoading}
-          onSearchChange={this.props.handleSearchChange}
           resultRenderer = {resultRenderer}
+          loading={this.props.isLoading}
           value={this.props.symbol}
           results={this.props.results}
+          onSearchChange={this.props.handleSearchChange}
           onResultSelect={this.props.handleResultSelect}
         />
         <div>
@@ -36,10 +36,16 @@ class Portfolio extends React.Component {
           stockName={this.props.stockName}
           latestPrice={this.props.latestPrice}
         />
-      <br/>
+          <br/>
         <BuyStocks
           purchaseQuantity={this.props.purchaseQuantity}
-          handlePurchaseQuantity={this.props.handlePurchaseQuantity}
+          latestPrice={this.props.latestPrice}
+          balance={this.props.balance}
+          totalPrice={this.props.totalPrice}
+          enoughFunds={this.props.enoughFunds}
+
+          handlePurchase={this.props.handlePurchase}
+          handlePurchaseSubmit={this.props.handlePurchaseSubmit}
         />
       </React.Fragment>
     )
